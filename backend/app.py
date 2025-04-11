@@ -1,6 +1,6 @@
 from flask import Flask
 from flask_cors import CORS
-from routes.predict import predict_route  # This will be our prediction blueprint
+from routes.predict import predict_route  # This will be our prediction bluepr
 
 app = Flask(__name__)
 CORS(app)
