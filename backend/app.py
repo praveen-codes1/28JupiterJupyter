@@ -1,21 +1,13 @@
-from flask import Flask, request, jsonify
+# Example in app.py
+from flask import Flask
 from flask_cors import CORS
 
 app = Flask(__name__)
-CORS(app)  # Allows your React frontend to talk to Flask
+CORS(app)
 
-@app.route("/")
-def home():
-    return jsonify({"message": "JJ ETA Flask backend is running!"})
+@app.route('/api/hello')
+def hello():
+    return {'message': 'Hello from Flask'}
 
-@app.route("/predict", methods=["POST"])
-def predict_eta():
-    data = request.json
-    # For now, just return the input as a dummy response
-    return jsonify({
-        "input": data,
-        "predicted_eta": "25 mins"  # Replace with model logic later
-    })
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     app.run(debug=True)
