@@ -1,16 +1,14 @@
 from flask import Flask
 from flask_cors import CORS
-from routes.predict import predict_route  # This will be our prediction blueprint
+from routes.predict import predict_bp  # Fixed this line
 
 app = Flask(__name__)
 CORS(app)
 
-# Registering the predict route
-app.register_blueprint(predict_route)
+app.register_blueprint(predict_bp)  # Register the correct blueprint
 
-# Optional test route
-@app.route('/api/hello')
-def hello():
+@app.route('/')
+def index():
     return {'message': 'Hello from Flask'}
 
 if __name__ == '__main__':
