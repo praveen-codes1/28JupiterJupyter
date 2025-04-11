@@ -6,7 +6,7 @@ from sklearn.metrics import r2_score
 import pickle  # Import pickle for saving the model
 
 # Load the data
-df = pd.read_csv(r"C:\Users\Vidhya\Desktop\JJ_ETA\data\Final_Dataset_with_Bangalore_Arrival_Time.csv")
+df = pd.read_csv(r"C:\Users\Vidhya\Desktop\JJ_ETA\data\Final_Dataset_v.csv")
 
 df["date"] = pd.to_datetime(df["date"])
 df["day_of_week"] = df["date"].dt.day_name()
@@ -23,8 +23,8 @@ day_map = {
 }
 df["day_of_week_num"] = df["day_of_week"].map(day_map)
 
-# Convert time string like "07:00" to datetime object and extract the hour (0 to 23)
-df["departure_hour"] = pd.to_datetime(df["departure_time"], format="%H:%M").dt.hour
+df["departure_hour"] = pd.to_datetime(df["departure_time"]).dt.hour
+
 
 # Convert "Home_to_office" and "Office_to_home" to numbers
 trip_map = {
@@ -34,8 +34,8 @@ trip_map = {
 df["trip_type_num"] = df["trip_type"].map(trip_map)
 
 # Features and target
-X = df[["home_lat", "home_lon", "day_of_week_num", "departure_hour", "trip_type_num", "baseline_duration_min"]]
-y = df["baseline_duration_min"]
+X = df[["home_lat", "home_lon", "day_of_week_num", "departure_hour", "trip_type_num", "time_taken"]]
+y = df["time_taken"]
 
 # Split the data into training and testing sets
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
