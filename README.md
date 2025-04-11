@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
@@ -68,3 +69,35 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+=======
+# JJ_ETA
+Ride ETA Predictor
+<h1>Folder Structure</h1>
+ride-eta-predictor/
+├── frontend/
+│   ├── src/
+│   │   ├── App.js
+│   │   └── components/
+│   │       ├── ETAForm.js
+│   │       ├── MapView.js
+│   │       ├── CompareETAs.js
+│   │       ├── HistoryTable.js
+│   │       ├── RouteSummary.js
+│   │       └── AnalyticsChart.js
+│   └── public/
+│       └── index.html
+│   └── package.json
+│
+├── backend/
+│   ├── app.py
+│   ├── model.pkl
+│   ├── utils.py
+│   ├── traffic_api.py
+│   └── requirements.txt
+│
+├── data/
+│   └── trips.csv
+├── notebooks/
+│   └── model_training.ipynb
+└── README.md
+>>>>>>> cddd465f875a6711600c52208d17f3884ae3e392
