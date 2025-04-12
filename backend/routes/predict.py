@@ -1,39 +1,38 @@
-# backend/routes/predict.py
 from flask import Blueprint, request, jsonify
-import joblib
+import pickle
 import numpy as np
 import os
 
-predict_bp = Blueprint('predict', __name__)
+# Create the Blueprint
+predict_route = Blueprint('predict_route', __name__)
 
-# Load the model
-model_path = os.path.join(os.path.dirname(__file__), '..', 'model', 'model.pkl')
-model = joblib.load(model_path)
+# Load the model (make sure path is correct relative to this file)
+model_path = os.path.join(os.path.dirname(__file__), '..', 'model', 'random_forest_model.pkl')
+with open(model_path, 'rb') as file:
+    model = pickle.load(file)
 
-@predict_bp.route('/predict', methods=['POST'])
-def predict():
-    data = request.get_json()
-
+@predict_route.route('/api/predict', methods=['POST'])
+def predict_eta():
     try:
-        # Extract input values
-        hour = int(data['time'])
-        day = int(data['day'])
-        src_lat = float(data['sourceLat'])
-        src_lon = float(data['sourceLon'])
-        dest_lat = float(data['destLat'])
-        dest_lon = float(data['destLon'])
+        data = request.get_json()
 
-        # Heuristic to classify trip type (0: Home_to_office, 1: Office_to_home)
-        trip_type = 0 if hour <= 12 else 1
+        # Extract features from the request data
+        home_lat = data.get('home_lat')
+        home_lon = data.get('home_lon')
+        day_of_week_num = data.get('day_of_week_num')
+        departure_hour = data.get('departure_hour')
+        trip_type_num = data.get('trip_type_num')
+        office_lat = data.get('office_lat')
+        office_lon = data.get('office_lon')
 
-        # Example feature vector for model:
-        input_features = np.array([[src_lat, src_lon, day, hour, trip_type, 0]])
+        # Create the feature array (input to the model)
+        features = np.array([[home_lat, home_lon, day_of_week_num, departure_hour, trip_type_num, office_lat, office_lon]])
 
-        # Predict
-        eta = model.predict(input_features)[0]
-
-        return jsonify({'eta': round(eta, 2)})
+        # Predict the ETA using the trained model
+        predicted_eta = model.predict(features)[0]
+        
+        # Return the predicted ETA as a rounded number of minutes
+        return jsonify({'predicted_eta': f"{total_minutes} min"})
 
     except Exception as e:
-        print("Error during prediction:", e)
-        return jsonify({'error': 'Prediction failed'}), 500
+        return jsonify({"error": str(e)}), 500

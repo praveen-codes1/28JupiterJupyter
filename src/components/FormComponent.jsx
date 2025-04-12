@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import formbg from '../assets/formbg.png'; // ✅ image imported properly
+import formbg from '../assets/formbg.png';
 
 export default function FormComponent() {
   const navigate = useNavigate();
@@ -10,8 +10,9 @@ export default function FormComponent() {
     day: '',
     sourceLat: '',
     sourceLon: '',
-    destLat: '',
-    destLon: ''
+    officeLat: '',
+    officeLon: '',
+    tripType: 0
   });
 
   const handleChange = (e) => {
@@ -20,16 +21,42 @@ export default function FormComponent() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    const dayMap = {
+      Monday: 0,
+      Tuesday: 1,
+      Wednesday: 2,
+      Thursday: 3,
+      Friday: 4,
+      Saturday: 5,
+      Sunday: 6
+    };
+
+    const inputData = {
+      home_lat: parseFloat(form.sourceLat),
+      home_lon: parseFloat(form.sourceLon),
+      day_of_week_num: isNaN(form.day) ? dayMap[form.day] : parseInt(form.day),
+      departure_hour: parseInt(form.time),
+      trip_type_num: parseInt(form.tripType),
+      office_lat: parseFloat(form.officeLat),
+      office_lon: parseFloat(form.officeLon)
+    };
+
     try {
-      const res = await fetch('http://localhost:5000/predict', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
+      const response = await fetch("http://127.0.0.1:5000/api/predict", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(inputData)
       });
-      const data = await res.json();
-      navigate('/eta', { state: { eta: data.eta } });
+
+      const data = await response.json();
+      console.log("Prediction response:", data);
+
+      navigate("/eta", { state: { predicted_eta: data.predicted_eta } }); // Pass as 'eta'
     } catch (err) {
-      console.error('Prediction failed', err);
+      console.error("Prediction failed", err);
     }
   };
 
@@ -51,7 +78,7 @@ export default function FormComponent() {
           <input
             name="time"
             type="text"
-            placeholder="Time of Day"
+            placeholder="Time of Day (e.g., 9 for 9AM)"
             className="bg-white/20 border border-white/30 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={handleChange}
             required
@@ -59,7 +86,7 @@ export default function FormComponent() {
           <input
             name="day"
             type="text"
-            placeholder="Day of Week"
+            placeholder="Day of Week (e.g., Monday)"
             className="bg-white/20 border border-white/30 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={handleChange}
             required
@@ -81,21 +108,34 @@ export default function FormComponent() {
             required
           />
           <input
-            name="destLat"
+            name="officeLat"
             type="text"
-            placeholder="Destination Latitude"
+            placeholder="Office Latitude"
             className="bg-white/20 border border-white/30 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={handleChange}
             required
           />
           <input
-            name="destLon"
+            name="officeLon"
             type="text"
-            placeholder="Destination Longitude"
+            placeholder="Office Longitude"
             className="bg-white/20 border border-white/30 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
             onChange={handleChange}
             required
           />
+          <div className="flex items-center justify-between">
+            <label htmlFor="tripType" className="text-white">Trip Type</label>
+            <select
+              name="tripType"
+              id="tripType"
+              value={form.tripType}
+              onChange={handleChange}
+              className="bg-white/20 border border-white/30 p-2 w-full rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-300"
+            >
+              <option value={0}>Home to Office</option>
+              <option value={1}>Office to Home</option>
+            </select>
+          </div>
           <button
             type="submit"
             className="w-full bg-green-400 text-black font-semibold py-2 rounded-xl hover:scale-105 transition"

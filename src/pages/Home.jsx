@@ -10,7 +10,6 @@ export default function Home() {
       <a href="https://mypickup.in/" target="_blank" rel="noopener noreferrer">
         <img src={logo} alt="Ride ETA Logo" className="mx-auto mt-[-40px] w-32 h-32 mb-6 rounded-full shadow-lg hover:scale-105 transition-transform duration-300" />
       </a>
-      
 
       <motion.div
         initial={{ opacity: 0, y: 30 }}
@@ -28,8 +27,15 @@ export default function Home() {
           to="/form"
           className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-6 rounded transition duration-300"
         >
-          Start Predicting
+          Predict ETA
         </Link>
+        {/* Optional: Add a section for viewing past predictions */}
+        {/* <Link
+          to="/history"
+          className="mt-4 text-blue-300 hover:text-blue-400"
+        >
+          View Past Predictions
+        </Link> */}
       </motion.div>
     </div>
   );

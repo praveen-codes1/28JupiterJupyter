@@ -1,26 +1,16 @@
-# backend/model/train_model.py
-
 import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import r2_score
-import joblib
-import os
+import pickle
 
-# Load the data
-df = pd.read_csv(r"C:/Users/PRAVEEN PATIL/Desktop/jj_eta/jj_eta_app/Data/Final_Dataset_with_Bangalore_Arrival_Time.csv")
+# Load the cleaned dataset
+df = pd.read_csv('C:/Users/PRAVEEN PATIL/Desktop/jj_eta/jj_eta_app/backend/Data/JJ_Final.csv')
 
-# Preprocessing
-df["date"] = pd.to_datetime(df["date"])
-df["day_of_week"] = df["date"].dt.day_name()
+# Extract departure hour from departure_time
+df["departure_hour"] = pd.to_datetime(df["departure_time"]).dt.hour
 
-day_map = {
-    "Monday": 0, "Tuesday": 1, "Wednesday": 2,
-    "Thursday": 3, "Friday": 4, "Saturday": 5, "Sunday": 6
-}
-df["day_of_week_num"] = df["day_of_week"].map(day_map)
-df["departure_hour"] = pd.to_datetime(df["departure_time"], format="%H:%M").dt.hour
-
+# Map trip_type to numerical values
 trip_map = {
     "Home_to_office": 0,
     "Office_to_home": 1
@@ -28,20 +18,21 @@ trip_map = {
 df["trip_type_num"] = df["trip_type"].map(trip_map)
 
 # Features and target
-X = df[["home_lat", "home_lon", "day_of_week_num", "departure_hour", "trip_type_num", "baseline_duration_min"]]
-y = df["baseline_duration_min"]
+X = df[["home_lat", "home_lon", "day_of_week", "departure_hour", "trip_type_num", "office_lat", "office_lon"]]
+y = df["time_taken"]
 
-# Split and train
+# Train-test split
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-model = RandomForestRegressor(n_estimators=100, random_state=42)
+
+# Initialize and train model
+model = RandomForestRegressor(n_estimators=200, random_state=42)
 model.fit(X_train, y_train)
 
-# Score
-pred = model.predict(X_test)
-r2 = r2_score(y_test, pred)
-print("Model trained! R² score:", r2)
+# Evaluate model
+predictions = model.predict(X_test)
+r2 = r2_score(y_test, predictions)
+print("Model R^2 Score:", r2)
 
-# Save the model
-model_dir = os.path.join(os.path.dirname(__file__), "model.pkl")
-joblib.dump(model, model_dir)
-print(f"Model saved at {model_dir}")
+# Save model
+with open('C:/Users/PRAVEEN PATIL/Desktop/jj_eta/jj_eta_app/backend/model/random_forest_model.pkl', "wb") as f:
+    pickle.dump(model, f)
